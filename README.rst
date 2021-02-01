@@ -14,3 +14,7 @@ Note, you need to grab the chart dependencies
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm dependency update
     helm dependency build
+
+    # Terrafoo
+    terraform init
+    terraform apply
