@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports: 
-  - name: http-port
+  - name: notebook-port
     port: {{ .Values.port }}
     targetPort: {{ .Values.targetPort }}
   selector:

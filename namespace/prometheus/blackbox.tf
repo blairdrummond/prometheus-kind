@@ -5,11 +5,6 @@
 #   - name: ${target}
 #     url: https://${target}.${root_domain}
 #
-variable "ingress_domain" {
-  type    = string
-  default = "covid.cloud.statcan.ca"
-}
-
 variable "target_services" {
     default = [
         "grafana",

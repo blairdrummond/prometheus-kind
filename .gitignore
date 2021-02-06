@@ -1,2 +1,5 @@
 *.tfstate
 *.tfstate.backup
+.kube
+*.log
+.terraform

@@ -1,0 +1,10 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: notebook-metrics
+spec:
+  selector:
+    matchExpressions:
+    - {key: notebook-name}
+  endpoints:
+  - port: notebook-port

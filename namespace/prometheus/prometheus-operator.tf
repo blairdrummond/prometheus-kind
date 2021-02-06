@@ -23,13 +23,19 @@
 # 	}
 # }
 
+locals {
+  prometheus_values = templatefile("${path.module}/values/prometheus.yaml.tpl", {
+    prometheus_grafana_password = "password",
+    ingress_domain = var.ingress_domain
+    slack_api_url = var.slack_api_url # export as TV_VAR_slack_api_url
+  })
+}
+
 
 resource "helm_release" "prometheus-operator" {
   name       = "prometheus-operator"
   chart      = "${path.module}/charts/kube-prometheus-stack"
   namespace = var.namespace
 
-  # values = [
-  # 	data.template_file.prometheus_values.rendered
-  # ]
+  values = [ local.prometheus_values ]
 }
