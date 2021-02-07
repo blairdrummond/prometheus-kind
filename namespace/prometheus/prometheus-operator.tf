@@ -26,8 +26,8 @@
 locals {
   prometheus_values = templatefile("${path.module}/values/prometheus.yaml.tpl", {
     prometheus_grafana_password = "password",
-    ingress_domain = var.ingress_domain
-    slack_api_url = var.slack_api_url # export as TV_VAR_slack_api_url
+    ingress_domain = var.ingress_domain,
+    slack_api_url = ""
   })
 }
 

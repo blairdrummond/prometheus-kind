@@ -147,7 +147,7 @@ prometheus:
       namespaceSelector:
         any: true
       endpoints:
-        - port: notebook-port
+        - targetPort: 8888
 
 alertmanager:
   config:

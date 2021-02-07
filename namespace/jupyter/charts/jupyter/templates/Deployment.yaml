@@ -18,5 +18,10 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         {{ toYaml .Values.image | nindent 8 }}
+        {{ if not .Values.image.env }}
+        env:
+        {{ end }}
+        - name: NB_PREFIX
+          value: {{ .Values.url }}
         ports:
         - containerPort: {{ .Values.targetPort }}

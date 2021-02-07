@@ -13,7 +13,7 @@ image:
   - "--NotebookApp.password=''"
   - "--NotebookApp.allow_origin='*'"
   - "--NotebookApp.authenticate_prometheus=False"
-  - "--NotebookApp.base_url=/notebook/blair-drummond/jupyter"
+  - "--NotebookApp.base_url=$(NB_PREFIX)"
   - "--NotebookApp.default_url=/tree"
 
 port: 8888
