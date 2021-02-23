@@ -18,6 +18,10 @@ kind-config.yaml:
 
 delete:
 	kind delete clusters $(PROJECT_NAME)
+	rm -f terraform.tfstate terraform.tfstate.backup
+
+setup: kind krew
+	echo "Done setup."
 
 kind:  kind-config.yaml
 	mkdir -p .kube
@@ -27,5 +31,27 @@ kind:  kind-config.yaml
 		--config kind-config.yaml \
 		--kubeconfig .kube/config
 
+	# # Create the pvc provisioner
+	helm template ./manual/provisioner | kubectl --kubeconfig .kube/config apply -f -
+
 kubectl-setup:
 	kubectl cluster-info --context kind-$(PROJECT_NAME)
+
+minio:
+	KUBECONFIG=.kube/config PATH=$$HOME/.krew/bin:$$PATH \
+		kubectl krew update || true
+
+	KUBECONFIG=.kube/config PATH=$$HOME/.krew/bin:$$PATH \
+		kubectl krew install minio || true
+
+	KUBECONFIG=.kube/config PATH=$$HOME/.krew/bin:$$PATH \
+		kubectl minio init || true
+
+	KUBECONFIG=.kube/config PATH=$$HOME/.krew/bin:$$PATH \
+		kubectl minio tenant create minio-tenant-1 \
+		--name minio-tenant-1  \
+		--servers 1            \
+		--volumes 4            \
+		--capacity 5Gi         \
+		--namespace minio      \
+		--storage-class local-path | tee minio-creds.txt

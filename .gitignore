@@ -3,3 +3,4 @@
 .kube
 *.log
 .terraform
+minio-creds.txt
