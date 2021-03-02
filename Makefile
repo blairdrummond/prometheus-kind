@@ -55,3 +55,9 @@ minio:
 		--capacity 5Gi         \
 		--namespace minio      \
 		--storage-class local-path | tee minio-creds.txt
+
+	# The operator was using an out-of-date console image,
+	# So needed to patch it.
+	kubectl --kubeconfig .kube/config \
+		-n minio patch tenants.minio.min.io minio-tenant-1 \
+		--type='json' -p='[{"op": "replace", "path": "/spec/console/image", "value":"minio/console:v0.6.2"}]'
