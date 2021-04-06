@@ -1,3 +1,13 @@
+variable "slack_api_url" {
+  description = "Slack Webhook"
+  type        = string
+}
+
+variable "minio_metrics_token" {
+  description = "MinIO metrics token"
+  type        = string
+}
+
 #variable "prometheus_grafana_password" {
 #  description = "Promtheus / Grafana Password"
 #  type        = string
@@ -27,7 +37,8 @@ locals {
   prometheus_values = templatefile("${path.module}/values/prometheus.yaml.tpl", {
     prometheus_grafana_password = "password",
     ingress_domain = var.ingress_domain,
-    slack_api_url = ""
+    slack_api_url = var.slack_api_url,
+    minio_metrics_token = var.minio_metrics_token
   })
 }
 

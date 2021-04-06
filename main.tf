@@ -12,6 +12,15 @@ variable "ingress_domain" {
   default     = "covid.cloud.statcan.ca"
 }
 
+variable "slack_api_url" {
+  description = "Slack webhook"
+  type        = string
+}
+
+variable "minio_metrics_token" {
+  description = "MinIO metrics token"
+  type        = string
+}
 
 provider "kubernetes" {
   #load_config_file = "true"
@@ -36,6 +45,8 @@ module "monitoring" {
   source = "./namespace/prometheus/"
   namespace = "monitoring"
   ingress_domain = var.ingress_domain
+  slack_api_url = var.slack_api_url
+  minio_metrics_token = var.minio_metrics_token
 }
 
 #module "local_path_storage" {

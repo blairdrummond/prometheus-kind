@@ -19,7 +19,7 @@ Note, you need to grab the chart dependencies
 
     # Terrafoo
     terraform init
-    terraform apply
+    TF_VAR_slack_api_url="" terraform apply
 
 
     # Install krew

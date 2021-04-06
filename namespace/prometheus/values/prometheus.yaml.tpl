@@ -118,14 +118,16 @@ prometheus:
       - name: prometheus-operator-alertmanager #previously 'alertmanager'
         namespace: monitoring
         port: 9093 #previously 'web'
-    # additionalScrapeConfigs:
-    # # for minio, this was generated via `mc admin prometheus generate <alias>`
-    #   - job_name: minio-job
-    #     bearer_token: "{var.minio_metrics_token}"
-    #     metrics_path: /minio/prometheus/metrics
-    #     scheme: http
-    #     static_configs:
-    #       - targets: ['minimal-tenant1-minio.minio:9000']
+
+    additionalScrapeConfigs:
+    # for minio, this was generated via `mc admin prometheus generate <alias>`
+      - job_name: minio-job
+        bearer_token: "{var.minio_metrics_token}"
+        metrics_path: /minio/v2/metrics/cluster
+        scheme: http
+        static_configs:
+          - targets: ['minio.minio-tenant-1']
+
     #storageSpec:
     #  volumeClaimTemplate:
     #    spec:
@@ -155,16 +157,16 @@ alertmanager:
       resolve_timeout: 5m
       slack_api_url: "${slack_api_url}"
     route:
-      group_by: ['alertname', 'namespace']
+      group_by: ['job', 'namespace']
       group_wait: 2m
       group_interval: 24h
       repeat_interval: 12h
       receiver: black_hole #default for less important notifs, do not clutter
       routes:
-      - reciever: 'slack-notifs'
+      - receiver: 'slack-notifs'
         match:
           severity: high
-      - reciever: 'slack-notifs'
+      - receiver: 'slack-notifs'
         match:
           alerttype: idle
 
@@ -180,9 +182,9 @@ alertmanager:
     #Inhibit Rules
     inhibit_rules:
       - target_match:
-        alertname: 'NodeNotReady'
+          alertname: 'NodeNotReady'
       - source_match_re:
-        alertname: '(NodeDiskPressure|NodeLowCPU|NodeMemoryPressure)'
+          alertname: '(NodeDiskPressure|NodeLowCPU|NodeMemoryPressure)'
   ingress:
     enabled: false
     # enabled: true

@@ -1,6 +1,5 @@
 PROJECT_NAME := monitoring-test
 
-
 .PHONY: clean kind
 
 all: clean _build
@@ -48,16 +47,39 @@ minio:
 		kubectl minio init || true
 
 	KUBECONFIG=.kube/config PATH=$$HOME/.krew/bin:$$PATH \
+		kubectl create namespace minio-tenant-1 || true
+
+	KUBECONFIG=.kube/config PATH=$$HOME/.krew/bin:$$PATH \
 		kubectl minio tenant create minio-tenant-1 \
-		--name minio-tenant-1  \
 		--servers 1            \
 		--volumes 4            \
 		--capacity 5Gi         \
-		--namespace minio      \
+		--namespace minio-tenant-1 \
 		--storage-class local-path | tee minio-creds.txt
 
 	# The operator was using an out-of-date console image,
 	# So needed to patch it.
 	kubectl --kubeconfig .kube/config \
-		-n minio patch tenants.minio.min.io minio-tenant-1 \
+		-n minio-tenant-1 patch tenants.minio.min.io minio-tenant-1 \
 		--type='json' -p='[{"op": "replace", "path": "/spec/console/image", "value":"minio/console:v0.6.2"}]'
+
+	# http only, please
+	kubectl --kubeconfig .kube/config \
+		-n minio-tenant-1 patch tenants.minio.min.io minio-tenant-1 \
+		--type='json' -p='[{"op": "replace", "path": "/spec/requestAutoCert", "value":false}]'
+
+minio-secrets:
+	@printf 'MINIO_ACCESS_KEY=%s\nMINIO_SECRET_KEY=%s\n' \
+		$$(kubectl --kubeconfig .kube/config -n minio-tenant-1 get secrets minio-tenant-1-creds-secret -o yaml \
+			| yq -r '.data[] | @base64d' | tr '\n' ' ')
+minio-add-local:
+	mc config host add local http://localhost:9000 \
+		$$(kubectl --kubeconfig .kube/config -n minio-tenant-1 get secrets minio-tenant-1-creds-secret -o yaml \
+			| yq -r '.data[] | @base64d' | tr '\n' ' ')
+
+minio-metrics-token: minio-add-local
+	mc admin prometheus generate local
+
+plan apply:
+	test -n "$$TF_VAR_slack_api_url"
+	terraform $@
